@@ -92,7 +92,7 @@ kubectl get ingress -n web-app
 
 | 參數 | 說明 | 默認值 |
 |------|------|--------|
-| `global.domain` | 應用域名 | `outer-jenkins.gbboss.com` |
+| `global.domain` | 應用域名 | 自行定義 |
 | `global.namespace` | K8s 命名空間 | `web-app` |
 | `backend.replicaCount` | Backend 副本數 | `2` |
 | `frontend.replicaCount` | Frontend 副本數 | `2` |
