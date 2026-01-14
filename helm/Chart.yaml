@@ -1,0 +1,14 @@
+apiVersion: v2
+name: japanese-learning
+description: A Helm chart for Japanese Learning web application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - japanese
+  - learning
+  - laravel
+  - vue
+maintainers:
+  - name: opdev037
+    email: operationtgfc037@gmail.com

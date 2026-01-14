@@ -1,0 +1,120 @@
+# 全局配置
+global:
+  domain: outer-jenkins.gbboss.com
+  namespace: web-app
+
+# Backend (Laravel API) 配置
+backend:
+  name: api
+  replicaCount: 2
+  
+  image:
+    repository: opdev037/project-api
+    tag: latest
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  env:
+    - name: APP_NAME
+      value: "Japanese Learning API"
+    - name: APP_ENV
+      value: "production"
+    - name: APP_DEBUG
+      value: "false"
+    - name: APP_URL
+      value: "http://outer-jenkins.gbboss.com"
+    - name: FRONTEND_URL
+      value: "http://outer-jenkins.gbboss.com"
+    - name: DB_CONNECTION
+      value: "mysql"
+    - name: DB_HOST
+      value: "mysql"
+    - name: DB_PORT
+      value: "3306"
+    - name: DB_DATABASE
+      value: "laravel"
+  
+  # Secret 環境變量（從 Secret 讀取）
+  secretEnv:
+    - name: APP_KEY
+      secretName: app-secrets
+      secretKey: app-key
+    - name: DB_USERNAME
+      secretName: app-secrets
+      secretKey: db-username
+    - name: DB_PASSWORD
+      secretName: app-secrets
+      secretKey: db-password
+    - name: GOOGLE_CLIENT_ID
+      secretName: app-secrets
+      secretKey: google-client-id
+    - name: GOOGLE_CLIENT_SECRET
+      secretName: app-secrets
+      secretKey: google-client-secret
+
+# Frontend (Vue 3) 配置
+frontend:
+  name: frontend
+  replicaCount: 2
+  
+  image:
+    repository: opdev037/project-frontend
+    tag: latest
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Ingress 配置
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: outer-jenkins.gbboss.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend: api
+        - path: /sanctum
+          pathType: Prefix
+          backend: api
+        - path: /
+          pathType: Prefix
+          backend: frontend
+  tls:
+    - secretName: japanese-learning-tls
+      hosts:
+        - outer-jenkins.gbboss.com
+
+# MySQL 配置（可選，如果需要在 K8s 內運行 MySQL）
+mysql:
+  enabled: false
+  # 如果啟用，會部署 MySQL StatefulSet
+  image: mysql:8.0
+  storageClass: nfs-client
+  storageSize: 10Gi
