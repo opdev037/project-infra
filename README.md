@@ -84,7 +84,7 @@ kubectl get ingress -n web-app
 
 #### 5. 訪問應用
 
-訪問: http://outer-jenkins.gbboss.com
+訪問: 自行配置的域名
 
 ## 配置說明
 
