@@ -111,10 +111,9 @@ ingress:
       hosts:
         - outer-jenkins.gbboss.com
 
-# MySQL 配置（可選，如果需要在 K8s 內運行 MySQL）
+# MySQL 配置
 mysql:
-  enabled: false
-  # 如果啟用，會部署 MySQL StatefulSet
+  enabled: true
   image: mysql:8.0
   storageClass: nfs-client
-  storageSize: 10Gi
+  storageSize: 20Gi
