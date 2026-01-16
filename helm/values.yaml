@@ -45,6 +45,18 @@ backend:
       value: "3306"
     - name: DB_DATABASE
       value: "laravel"
+    # Redis 配置
+    - name: REDIS_HOST
+      value: "redis"
+    - name: REDIS_PORT
+      value: "6379"
+    # Queue 配置
+    - name: QUEUE_CONNECTION
+      value: "redis"
+    - name: CACHE_DRIVER
+      value: "redis"
+    - name: SESSION_DRIVER
+      value: "redis"
   
   # Secret 環境變量（從 Secret 讀取）
   secretEnv:
@@ -117,3 +129,42 @@ mysql:
   image: mysql:8.0
   storageClass: nfs-client
   storageSize: 20Gi
+
+# Redis 配置
+redis:
+  enabled: true
+  image: redis:7-alpine
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Horizon (Queue Worker) 配置
+horizon:
+  enabled: true
+  name: horizon
+  replicaCount: 1
+
+  image:
+    repository: opdev037/project-horizon
+    tag: latest
+    pullPolicy: Always
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # 自動擴展配置 (HPA)
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
