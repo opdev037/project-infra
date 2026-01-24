@@ -76,13 +76,6 @@ spec:
           limits:
             memory: {{ .Values.horizon.resources.limits.memory | quote }}
             cpu: {{ .Values.horizon.resources.limits.cpu | quote }}
-        # Horizon 需要較長時間來優雅關閉
-        lifecycle:
-          preStop:
-            exec:
-              command:
-              - php
-              - artisan
-              - horizon:terminate
-      terminationGracePeriodSeconds: 60
+      # Queue worker 優雅關閉
+      terminationGracePeriodSeconds: 30
 {{- end }}
