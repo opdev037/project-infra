@@ -1,6 +1,6 @@
 # 全局配置
 global:
-  domain: outer-jenkins.gbboss.com
+  domain: bukenon.duckdns.org
   namespace: web-app
 
 # Backend (Laravel API) 配置
@@ -34,9 +34,9 @@ backend:
     - name: APP_DEBUG
       value: "false"
     - name: APP_URL
-      value: "http://outer-jenkins.gbboss.com"
+      value: "http://bukenon.duckdns.org"
     - name: FRONTEND_URL
-      value: "http://outer-jenkins.gbboss.com"
+      value: "http://bukenon.duckdns.org"
     - name: DB_CONNECTION
       value: "mysql"
     - name: DB_HOST
@@ -107,7 +107,7 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
   hosts:
-    - host: outer-jenkins.gbboss.com
+    - host: bukenon.duckdns.org
       paths:
         - path: /api
           pathType: Prefix
@@ -121,7 +121,7 @@ ingress:
   tls:
     - secretName: japanese-learning-tls
       hosts:
-        - outer-jenkins.gbboss.com
+        - bukenon.duckdns.org
 
 # MySQL 配置
 mysql:
