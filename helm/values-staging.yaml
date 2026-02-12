@@ -1,0 +1,175 @@
+# ============================================
+# 測試環境（地端 Kubeadm）
+# 部署指令: helm upgrade --install bukenon . -n web-app -f values-staging.yaml
+# ============================================
+
+global:
+  domain: bukenon.duckdns.org
+  namespace: web-app
+
+# Cloud SQL 停用（測試環境用自建 MySQL）
+cloudsql:
+  enabled: false
+  connectionName: ""
+
+# MySQL（測試環境自建）
+mysql:
+  enabled: true
+  image: mysql:8.0
+  storageClass: nfs-client
+  storageSize: 20Gi
+
+# Redis（測試環境自建）
+redis:
+  enabled: true
+  image: redis:7-alpine
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Backend (Laravel API)
+backend:
+  name: api
+  replicaCount: 1
+
+  image:
+    repository: opdev037/project-api
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  env:
+    - name: APP_NAME
+      value: "Japanese Learning API"
+    - name: APP_ENV
+      value: "staging"
+    - name: APP_DEBUG
+      value: "true"
+    - name: APP_URL
+      value: "https://bukenon.duckdns.org"
+    - name: FRONTEND_URL
+      value: "https://bukenon.duckdns.org"
+    - name: DB_CONNECTION
+      value: "mysql"
+    - name: DB_HOST
+      value: "mysql"
+    - name: DB_PORT
+      value: "3306"
+    - name: DB_DATABASE
+      value: "laravel"
+    - name: REDIS_HOST
+      value: "redis"
+    - name: REDIS_PORT
+      value: "6379"
+    - name: QUEUE_CONNECTION
+      value: "redis"
+    - name: CACHE_DRIVER
+      value: "redis"
+    - name: SESSION_DRIVER
+      value: "redis"
+
+  secretEnv:
+    - name: APP_KEY
+      secretName: app-secrets
+      secretKey: app-key
+    - name: DB_USERNAME
+      secretName: app-secrets
+      secretKey: db-username
+    - name: DB_PASSWORD
+      secretName: app-secrets
+      secretKey: db-password
+    - name: GOOGLE_CLIENT_ID
+      secretName: app-secrets
+      secretKey: google-client-id
+    - name: GOOGLE_CLIENT_SECRET
+      secretName: app-secrets
+      secretKey: google-client-secret
+
+# Frontend (Vue 3)
+frontend:
+  name: frontend
+  replicaCount: 1
+
+  image:
+    repository: opdev037/project-frontend
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Ingress
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: bukenon.duckdns.org
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend: api
+        - path: /sanctum
+          pathType: Prefix
+          backend: api
+        - path: /
+          pathType: Prefix
+          backend: frontend
+  tls:
+    - secretName: japanese-learning-tls
+      hosts:
+        - bukenon.duckdns.org
+
+# Horizon (Queue Worker)
+horizon:
+  enabled: true
+  name: horizon
+  replicaCount: 1
+
+  image:
+    repository: opdev037/project-horizon
+    tag: latest
+    pullPolicy: Always
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80

@@ -1,13 +1,26 @@
-# 全局配置
+# ============================================
+# 正式環境（GKE Autopilot）
+# 部署指令: helm upgrade --install bukenon . -n web-app -f values-production.yaml
+# ============================================
+
 global:
   domain: bukenon.duckdns.org
   namespace: web-app
 
-# Cloud SQL 配置
+# Cloud SQL 啟用
 cloudsql:
+  enabled: true
   connectionName: "project-cd35cc81-f3ec-4ad4-a93:asia-east1:bukenon-db"
 
-# Backend (Laravel API) 配置
+# MySQL 停用（正式環境用 Cloud SQL）
+mysql:
+  enabled: false
+
+# Redis 停用（正式環境用 Bitnami Helm Chart）
+redis:
+  enabled: false
+
+# Backend (Laravel API)
 backend:
   name: api
   replicaCount: 2
@@ -49,12 +62,10 @@ backend:
       value: "3306"
     - name: DB_DATABASE
       value: "japanese_learning"
-    # Redis 配置
     - name: REDIS_HOST
       value: "redis-master.web-app.svc.cluster.local"
     - name: REDIS_PORT
       value: "6379"
-    # Queue 配置
     - name: QUEUE_CONNECTION
       value: "redis"
     - name: CACHE_DRIVER
@@ -62,7 +73,6 @@ backend:
     - name: SESSION_DRIVER
       value: "redis"
 
-  # Secret 環境變量（從 Secret 讀取）
   secretEnv:
     - name: APP_KEY
       secretName: app-secrets
@@ -83,7 +93,7 @@ backend:
       secretName: app-secrets
       secretKey: google-client-secret
 
-# Frontend (Vue 3) 配置
+# Frontend (Vue 3)
 frontend:
   name: frontend
   replicaCount: 2
@@ -106,7 +116,7 @@ frontend:
       memory: "256Mi"
       cpu: "200m"
 
-# Ingress 配置
+# Ingress
 ingress:
   enabled: true
   className: nginx
@@ -130,7 +140,7 @@ ingress:
       hosts:
         - bukenon.duckdns.org
 
-# Horizon (Queue Worker) 配置
+# Horizon (Queue Worker)
 horizon:
   enabled: true
   name: horizon
@@ -149,7 +159,6 @@ horizon:
       memory: "512Mi"
       cpu: "500m"
 
-  # 自動擴展配置 (HPA)
   autoscaling:
     enabled: true
     minReplicas: 1

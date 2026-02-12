@@ -18,7 +18,9 @@ spec:
         app: {{ .Values.horizon.name }}
         tier: worker
     spec:
+      {{- if .Values.cloudsql.enabled }}
       serviceAccountName: cloudsql-proxy
+      {{- end }}
       terminationGracePeriodSeconds: 30
       containers:
       - name: {{ .Values.horizon.name }}
@@ -43,6 +45,7 @@ spec:
           limits:
             memory: {{ .Values.horizon.resources.limits.memory | quote }}
             cpu: {{ .Values.horizon.resources.limits.cpu | quote }}
+      {{- if .Values.cloudsql.enabled }}
       # Cloud SQL Proxy Sidecar
       - name: cloud-sql-proxy
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.0
@@ -55,4 +58,5 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "100m"
+      {{- end }}
 {{- end }}

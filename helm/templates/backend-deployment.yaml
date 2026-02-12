@@ -17,7 +17,9 @@ spec:
         app: {{ .Values.backend.name }}
         tier: backend
     spec:
+      {{- if .Values.cloudsql.enabled }}
       serviceAccountName: cloudsql-proxy
+      {{- end }}
       containers:
       - name: {{ .Values.backend.name }}
         image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
@@ -51,6 +53,7 @@ spec:
             port: http
           initialDelaySeconds: 10
           periodSeconds: 5
+      {{- if .Values.cloudsql.enabled }}
       # Cloud SQL Proxy Sidecar
       - name: cloud-sql-proxy
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.0
@@ -63,3 +66,4 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "100m"
+      {{- end }}
