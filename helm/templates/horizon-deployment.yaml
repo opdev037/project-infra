@@ -18,57 +18,24 @@ spec:
         app: {{ .Values.horizon.name }}
         tier: worker
     spec:
+      serviceAccountName: cloudsql-proxy
+      terminationGracePeriodSeconds: 30
       containers:
       - name: {{ .Values.horizon.name }}
         image: "{{ .Values.horizon.image.repository }}:{{ .Values.horizon.image.tag }}"
         imagePullPolicy: {{ .Values.horizon.image.pullPolicy }}
         env:
-        # 基本環境變數
-        - name: APP_NAME
-          value: {{ .Values.backend.env | first | dig "value" "Japanese Learning API" | quote }}
-        - name: APP_ENV
-          value: "production"
-        - name: APP_DEBUG
-          value: "false"
-        - name: APP_URL
-          value: "http://{{ .Values.global.domain }}"
-        # 資料庫配置
-        - name: DB_CONNECTION
-          value: "mysql"
-        - name: DB_HOST
-          value: "mysql"
-        - name: DB_PORT
-          value: "3306"
-        - name: DB_DATABASE
-          value: "laravel"
-        # Redis 配置
-        - name: REDIS_HOST
-          value: "redis"
-        - name: REDIS_PORT
-          value: "6379"
-        # Queue 配置
-        - name: QUEUE_CONNECTION
-          value: "redis"
-        - name: CACHE_DRIVER
-          value: "redis"
-        - name: SESSION_DRIVER
-          value: "redis"
-        # Secret 環境變量
-        - name: APP_KEY
+        {{- range .Values.backend.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        {{- range .Values.backend.secretEnv }}
+        - name: {{ .name }}
           valueFrom:
             secretKeyRef:
-              name: app-secrets
-              key: app-key
-        - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: db-username
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: db-password
+              name: {{ .secretName }}
+              key: {{ .secretKey }}
+        {{- end }}
         resources:
           requests:
             memory: {{ .Values.horizon.resources.requests.memory | quote }}
@@ -76,6 +43,16 @@ spec:
           limits:
             memory: {{ .Values.horizon.resources.limits.memory | quote }}
             cpu: {{ .Values.horizon.resources.limits.cpu | quote }}
-      # Queue worker 優雅關閉
-      terminationGracePeriodSeconds: 30
+      # Cloud SQL Proxy Sidecar
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.0
+        args:
+          - "{{ .Values.cloudsql.connectionName }}"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
 {{- end }}

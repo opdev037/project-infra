@@ -3,21 +3,25 @@ global:
   domain: bukenon.duckdns.org
   namespace: web-app
 
+# Cloud SQL 配置
+cloudsql:
+  connectionName: "project-cd35cc81-f3ec-4ad4-a93:asia-east1:bukenon-db"
+
 # Backend (Laravel API) 配置
 backend:
   name: api
   replicaCount: 2
-  
+
   image:
-    repository: opdev037/project-api
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-api
     tag: latest
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
+
   resources:
     requests:
       memory: "256Mi"
@@ -25,7 +29,7 @@ backend:
     limits:
       memory: "512Mi"
       cpu: "500m"
-  
+
   env:
     - name: APP_NAME
       value: "Japanese Learning API"
@@ -34,20 +38,20 @@ backend:
     - name: APP_DEBUG
       value: "false"
     - name: APP_URL
-      value: "http://bukenon.duckdns.org"
+      value: "https://bukenon.duckdns.org"
     - name: FRONTEND_URL
-      value: "http://bukenon.duckdns.org"
+      value: "https://bukenon.duckdns.org"
     - name: DB_CONNECTION
       value: "mysql"
     - name: DB_HOST
-      value: "mysql"
+      value: "127.0.0.1"
     - name: DB_PORT
       value: "3306"
     - name: DB_DATABASE
-      value: "laravel"
+      value: "japanese_learning"
     # Redis 配置
     - name: REDIS_HOST
-      value: "redis"
+      value: "redis-master.web-app.svc.cluster.local"
     - name: REDIS_PORT
       value: "6379"
     # Queue 配置
@@ -57,7 +61,7 @@ backend:
       value: "redis"
     - name: SESSION_DRIVER
       value: "redis"
-  
+
   # Secret 環境變量（從 Secret 讀取）
   secretEnv:
     - name: APP_KEY
@@ -69,6 +73,9 @@ backend:
     - name: DB_PASSWORD
       secretName: app-secrets
       secretKey: db-password
+    - name: REDIS_PASSWORD
+      secretName: app-secrets
+      secretKey: redis-password
     - name: GOOGLE_CLIENT_ID
       secretName: app-secrets
       secretKey: google-client-id
@@ -80,17 +87,17 @@ backend:
 frontend:
   name: frontend
   replicaCount: 2
-  
+
   image:
-    repository: opdev037/project-frontend
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-frontend
     tag: latest
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
+
   resources:
     requests:
       memory: "128Mi"
@@ -105,7 +112,7 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
     - host: bukenon.duckdns.org
       paths:
@@ -123,25 +130,6 @@ ingress:
       hosts:
         - bukenon.duckdns.org
 
-# MySQL 配置
-mysql:
-  enabled: true
-  image: mysql:8.0
-  storageClass: nfs-client
-  storageSize: 20Gi
-
-# Redis 配置
-redis:
-  enabled: true
-  image: redis:7-alpine
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "100m"
-    limits:
-      memory: "256Mi"
-      cpu: "200m"
-
 # Horizon (Queue Worker) 配置
 horizon:
   enabled: true
@@ -149,7 +137,7 @@ horizon:
   replicaCount: 1
 
   image:
-    repository: opdev037/project-horizon
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-horizon
     tag: latest
     pullPolicy: Always
 
