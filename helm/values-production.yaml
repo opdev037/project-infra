@@ -10,7 +10,7 @@ global:
 # Cloud SQL 啟用
 cloudsql:
   enabled: true
-  connectionName: "project-cd35cc81-f3ec-4ad4-a93:asia-east1:bukenon-db"
+  connectionName: "project-cd35cc81-f3ec-4ad4-a93:asia-east1:gke-test-1"
 
 # MySQL 停用（正式環境用 Cloud SQL）
 mysql:
