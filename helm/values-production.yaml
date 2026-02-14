@@ -26,7 +26,7 @@ backend:
   replicaCount: 2
 
   image:
-    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-api
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/gke-test-1/project-api
     tag: latest
     pullPolicy: Always
 
@@ -99,7 +99,7 @@ frontend:
   replicaCount: 2
 
   image:
-    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-frontend
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/gke-test-1/project-frontend
     tag: latest
     pullPolicy: Always
 
@@ -147,7 +147,7 @@ horizon:
   replicaCount: 1
 
   image:
-    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/bukenon/project-horizon
+    repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/gke-test-1/project-horizon
     tag: latest
     pullPolicy: Always
 
