@@ -23,7 +23,7 @@ redis:
 # Backend (Laravel API)
 backend:
   name: api
-  replicaCount: 2
+  replicaCount: 1
 
   image:
     repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/gke-test-1/project-api
@@ -96,7 +96,7 @@ backend:
 # Frontend (Vue 3)
 frontend:
   name: frontend
-  replicaCount: 2
+  replicaCount: 1
 
   image:
     repository: asia-east1-docker.pkg.dev/project-cd35cc81-f3ec-4ad4-a93/gke-test-1/project-frontend
