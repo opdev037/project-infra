@@ -8,6 +8,9 @@ metadata:
     tier: backend
 spec:
   replicas: {{ .Values.backend.replicaCount }}
+  # GKE Autopilot 免費額度資源有限，使用 Recreate 避免滾動更新時雙倍資源不足
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Values.backend.name }}
