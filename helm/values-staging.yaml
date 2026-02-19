@@ -7,6 +7,10 @@ global:
   domain: bukenon.duckdns.org
   namespace: web-app
 
+# ClusterIssuer 由 kubectl 手動管理，不由 Helm 建立（避免 ownership 衝突）
+clusterIssuer:
+  enabled: false
+
 # Cloud SQL 停用（測試環境用自建 MySQL）
 cloudsql:
   enabled: false
