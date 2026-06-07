@@ -12,3 +12,26 @@ keywords:
 maintainers:
   - name: opdev037
     email: operationtgfc037@gmail.com
+
+dependencies:
+  # ---- ELK Stack ----
+  - name: elasticsearch
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: elasticsearch.enabled
+
+  - name: kibana
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: kibana.enabled
+
+  - name: logstash
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: logstash.enabled
+
+  # ---- Kafka ----
+  - name: kafka
+    version: "26.11.4"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: kafka.enabled

@@ -177,3 +177,140 @@ horizon:
     maxReplicas: 3
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
+
+# ============================================================
+# Elasticsearch（測試環境自建 - 單節點模式）
+# ============================================================
+elasticsearch:
+  enabled: true
+  replicas: 1
+  minimumMasterNodes: 1
+  clusterName: "japanese-learning-es"
+  # 降低 JVM heap，配合測試環境記憶體限制
+  esJavaOpts: "-Xmx512m -Xms512m"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+  persistence:
+    enabled: true
+    storageClass: "nfs-client"
+    size: 30Gi
+  service:
+    type: ClusterIP
+    port: 9200
+  # 單節點模式必須設定，否則叢集無法啟動
+  extraEnvs:
+    - name: discovery.type
+      value: single-node
+    - name: xpack.security.enabled
+      value: "false"
+
+# ============================================================
+# Kibana（測試環境 - 連接本地 Elasticsearch）
+# ============================================================
+kibana:
+  enabled: true
+  elasticsearchHosts: "http://elasticsearch-master:9200"
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+  service:
+    type: ClusterIP
+    port: 5601
+
+# ============================================================
+# Logstash（測試環境 - 接收 Kafka 訊息並寫入 Elasticsearch）
+# ============================================================
+logstash:
+  enabled: true
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+  persistence:
+    enabled: false
+  # Pipeline：從 Kafka 讀取 → 寫入 Elasticsearch
+  logstashPipeline:
+    logstash.conf: |
+      input {
+        kafka {
+          bootstrap_servers => "japanese-learning-kafka:9092"
+          topics => ["app-logs"]
+          codec => "json"
+          group_id => "logstash-consumer"
+        }
+      }
+      filter {
+        if [fields][app] == "backend" {
+          mutate {
+            add_field => { "[@metadata][index]" => "backend-logs" }
+          }
+        } else {
+          mutate {
+            add_field => { "[@metadata][index]" => "app-logs" }
+          }
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["http://elasticsearch-master:9200"]
+          index => "%{[@metadata][index]}-%{+YYYY.MM.dd}"
+        }
+      }
+
+# ============================================================
+# Kafka（測試環境 - KRaft 模式，不需要 ZooKeeper）
+# ============================================================
+kafka:
+  enabled: true
+  # KRaft 模式（Kafka 3.3+，內建 Raft，無需 ZooKeeper）
+  kraft:
+    enabled: true
+  # Combined 模式：Controller 同時擔任 Broker
+  controller:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+  broker:
+    replicaCount: 0  # 0 = combined 模式
+  persistence:
+    enabled: true
+    storageClass: "nfs-client"
+    size: 8Gi
+  service:
+    type: ClusterIP
+    ports:
+      client: 9092
+  listeners:
+    client:
+      protocol: PLAINTEXT
+  # 自動建立 Topics
+  provisioning:
+    enabled: true
+    topics:
+      - name: app-logs
+        partitions: 1
+        replicationFactor: 1
+        config:
+          retention.ms: "604800000"  # 保留 7 天
+      - name: app-events
+        partitions: 1
+        replicationFactor: 1
+        config:
+          retention.ms: "604800000"
