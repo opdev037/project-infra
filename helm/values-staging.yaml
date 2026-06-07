@@ -297,9 +297,18 @@ kafka:
     type: ClusterIP
     ports:
       client: 9092
+  # 測試環境關閉 SASL，全部用 PLAINTEXT，不需要密碼
   listeners:
     client:
       protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+  sasl:
+    enabledMechanisms: ""
+    interbroker:
+      mechanism: ""
   # 自動建立 Topics
   provisioning:
     enabled: true
