@@ -308,10 +308,6 @@ kafka:
       protocol: PLAINTEXT
     controller:
       protocol: PLAINTEXT
-  sasl:
-    enabledMechanisms: ""
-    interbroker:
-      mechanism: ""
   # 自動建立 Topics
   provisioning:
     enabled: true
