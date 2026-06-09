@@ -31,6 +31,6 @@ dependencies:
 
   # ---- Kafka ----
   - name: kafka
-    version: "26.11.4"
+    version: "32.4.3"
     repository: "https://charts.bitnami.com/bitnami"
     condition: kafka.enabled
