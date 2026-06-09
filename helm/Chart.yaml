@@ -29,8 +29,5 @@ dependencies:
     repository: "https://helm.elastic.co"
     condition: logstash.enabled
 
-  # ---- Kafka ----
-  - name: kafka
-    version: "32.4.3"
-    repository: "https://charts.bitnami.com/bitnami"
-    condition: kafka.enabled
+  # Kafka 改為自訂 templates/kafka.yaml（apache/kafka 官方 image）
+  # Bitnami kafka image 於 2025/08 起不再免費公開，故移除依賴

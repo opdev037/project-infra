@@ -271,52 +271,22 @@ logstash:
       }
 
 # ============================================================
-# Kafka（測試環境 - KRaft 模式，不需要 ZooKeeper）
+# Kafka（測試環境 - KRaft 模式，使用 apache/kafka 官方 image）
+# Bitnami image 已於 2025/08 停止免費，改為自訂 templates/kafka.yaml
 # ============================================================
 kafka:
   enabled: true
-  # Kafka 4.0 已移除 ZooKeeper，KRaft 是唯一模式
-  # clusterId 移到頂層（chart 32.x 結構改變）
+  image: "apache/kafka:4.0.0"
+  # KRaft cluster ID（固定值，避免每次重建）
   clusterId: "a6e4EJ2tEdGAtADATdQwyA"
-  # Combined 模式：Controller 同時擔任 Broker
-  controller:
-    replicaCount: 1
-    resources:
-      requests:
-        cpu: "250m"
-        memory: "512Mi"
-      limits:
-        cpu: "500m"
-        memory: "1Gi"
-  broker:
-    replicaCount: 0  # 0 = combined 模式
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
   persistence:
     enabled: true
     storageClass: "nfs-client"
     size: 8Gi
-  service:
-    type: ClusterIP
-    ports:
-      client: 9092
-  # 測試環境關閉 SASL，全部用 PLAINTEXT，不需要密碼
-  listeners:
-    client:
-      protocol: PLAINTEXT
-    interbroker:
-      protocol: PLAINTEXT
-    controller:
-      protocol: PLAINTEXT
-  # 自動建立 Topics（暫時關閉，避免 pre-upgrade hook 超時）
-  provisioning:
-    enabled: false
-    topics:
-      - name: app-logs
-        partitions: 1
-        replicationFactor: 1
-        config:
-          retention.ms: "604800000"  # 保留 7 天
-      - name: app-events
-        partitions: 1
-        replicationFactor: 1
-        config:
-          retention.ms: "604800000"
