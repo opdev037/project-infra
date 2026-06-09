@@ -185,6 +185,7 @@ elasticsearch:
   enabled: true
   replicas: 1
   minimumMasterNodes: 1
+  clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s" 
   clusterName: "japanese-learning-es"
   esJavaOpts: "-Xmx512m -Xms512m"
   # 使用 HTTP（不建立 TLS 憑證，避免 Kibana hook 找不到 secret）
