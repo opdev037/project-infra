@@ -215,9 +215,7 @@ elasticsearch:
 # ============================================================
 kibana:
   enabled: true
-  # 明確使用 HTTP，不掛載 TLS secret
-  protocol: http
-  elasticsearchHosts: "http://elasticsearch-master:9200"
+  elasticsearchHosts: "http://japanese-learning-es-master:9200"
   resources:
     requests:
       cpu: "200m"
@@ -228,11 +226,6 @@ kibana:
   service:
     type: ClusterIP
     port: 5601
-  kibanaConfig:
-    kibana.yml: |
-      elasticsearch.hosts: ["http://japanese-learning-es-master:9200"]
-      xpack.security.enabled: false
-      xpack.fleet.enabled: false
 
 # ============================================================
 # Logstash（測試環境 - 接收 Kafka 訊息並寫入 Elasticsearch）

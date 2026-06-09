@@ -14,19 +14,18 @@ maintainers:
     email: operationtgfc037@gmail.com
 
 dependencies:
-  # ---- ELK Stack ----
   - name: elasticsearch
-    version: "8.5.1"
+    version: "7.17.3"
     repository: "https://helm.elastic.co"
     condition: elasticsearch.enabled
 
   - name: kibana
-    version: "8.5.1"
+    version: "7.17.3"
     repository: "https://helm.elastic.co"
     condition: kibana.enabled
 
   - name: logstash
-    version: "8.5.1"
+    version: "7.17.3"
     repository: "https://helm.elastic.co"
     condition: logstash.enabled
 
