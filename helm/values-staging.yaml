@@ -228,6 +228,11 @@ kibana:
   service:
     type: ClusterIP
     port: 5601
+  kibanaConfig:
+    kibana.yml: |
+      elasticsearch.hosts: ["http://japanese-learning-es-master:9200"]
+      xpack.security.enabled: false
+      xpack.fleet.enabled: false
 
 # ============================================================
 # Logstash（測試環境 - 接收 Kafka 訊息並寫入 Elasticsearch）
