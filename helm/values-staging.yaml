@@ -205,7 +205,7 @@ elasticsearch:
   persistence:
     enabled: true
     storageClass: "nfs-client"
-    size: 30Gi
+    size: 8Gi
   service:
     type: ClusterIP
     port: 9200
