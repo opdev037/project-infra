@@ -275,12 +275,9 @@ logstash:
 # ============================================================
 kafka:
   enabled: true
-  # KRaft 模式（Kafka 3.3+，內建 Raft，無需 ZooKeeper）
-  kraft:
-    enabled: true
-    # 固定 Cluster ID，避免 upgrade 時報 PASSWORDS ERROR
-    # 格式必須是 22 位 base64url（不含 padding）
-    clusterId: "a6e4EJ2tEdGAtADATdQwyA"
+  # Kafka 4.0 已移除 ZooKeeper，KRaft 是唯一模式
+  # clusterId 移到頂層（chart 32.x 結構改變）
+  clusterId: "a6e4EJ2tEdGAtADATdQwyA"
   # Combined 模式：Controller 同時擔任 Broker
   controller:
     replicaCount: 1
