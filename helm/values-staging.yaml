@@ -224,8 +224,8 @@ kibana:
       cpu: "500m"
       memory: "1Gi"
   service:
-    type: ClusterIP
-    port: 5601
+    type: NodePort
+    nodePort: 30561
 
 # ============================================================
 # Logstash（測試環境 - 接收 Kafka 訊息並寫入 Elasticsearch）
