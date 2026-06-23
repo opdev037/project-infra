@@ -241,9 +241,25 @@ logstash:
       memory: "1Gi"
   persistence:
     enabled: false
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 9600
+    initialDelaySeconds: 300
+    periodSeconds: 10
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 9600
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    failureThreshold: 3
   logstashConfig:
     logstash.yml: |
       xpack.monitoring.enabled: false
+      http.enabled: true
+      http.port: 9600
   # Pipeline：從 Kafka 讀取 → 寫入 Elasticsearch
   logstashPipeline:
     logstash.conf: |
