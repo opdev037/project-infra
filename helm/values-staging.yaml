@@ -87,6 +87,8 @@ backend:
       value: "redis"
     - name: SESSION_DRIVER
       value: "redis"
+    - name: KAFKA_BROKERS
+      value: "sideproject-kafka:9092"
 
   secretEnv:
     - name: APP_KEY
@@ -273,9 +275,9 @@ logstash:
         }
       }
       filter {
-        if [fields][app] == "backend" {
+        if [level] == "error" {
           mutate {
-            add_field => { "[@metadata][index]" => "backend-logs" }
+            add_field => { "[@metadata][index]" => "error-logs" }
           }
         } else {
           mutate {
