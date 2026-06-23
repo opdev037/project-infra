@@ -241,6 +241,9 @@ logstash:
       memory: "1Gi"
   persistence:
     enabled: false
+  logstashConfig:
+    logstash.yml: |
+      xpack.monitoring.enabled: false
   # Pipeline：從 Kafka 讀取 → 寫入 Elasticsearch
   logstashPipeline:
     logstash.conf: |
