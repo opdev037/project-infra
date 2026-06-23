@@ -257,6 +257,7 @@ logstash:
     failureThreshold: 3
   logstashConfig:
     logstash.yml: |
+      http.host: "0.0.0.0"
       xpack.monitoring.enabled: false
       http.enabled: true
       http.port: 9600
