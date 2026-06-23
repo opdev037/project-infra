@@ -246,7 +246,7 @@ logstash:
     logstash.conf: |
       input {
         kafka {
-          bootstrap_servers => "japanese-learning-kafka:9092"
+          bootstrap_servers => "sideproject-kafka:9092"
           topics => ["app-logs"]
           codec => "json"
           group_id => "logstash-consumer"
@@ -265,7 +265,7 @@ logstash:
       }
       output {
         elasticsearch {
-          hosts => ["http://elasticsearch-master:9200"]
+          hosts => ["http://japanese-learning-es-master:9200"]
           index => "%{[@metadata][index]}-%{+YYYY.MM.dd}"
         }
       }
